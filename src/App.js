@@ -1,13 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
+import ProjectSettings from './components/ProjectSettings';
 
 function App() {
   return (
     <div className='App'>
       <header className='App-header'>
+        <ProjectSettings></ProjectSettings>
         <img src={logo} className='App-logo' alt='logo' />
         <p>
-          Hi again<br></br>
+          Hi again 2<br></br>
           Edit <code>src/App.js</code> and save to reload.
         </p>
         <a
