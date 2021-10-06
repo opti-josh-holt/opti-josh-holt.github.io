@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // components
-import ProjectSettings from './ProjectSettings';
+import InputSettings from './InputSettings';
+import DecisionResults from './DecisionResults';
 
 // mui
 import CssBaseline from '@mui/material/CssBaseline';
@@ -24,11 +25,34 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const AppLayout = (props) => {
+  const [inputSettings, setInputSettings] = useState(null);
+  // Passed on props to InputSettings and passed up when submitted
+  const getInputSettings = (settings) => {
+    setInputSettings(settings);
+  };
+
   return (
     <React.Fragment>
       <CssBaseline />
-
       <Box sx={{ flexGrow: 1, height: '100vh' }}>
+        <AppBar position='static'>
+          <Toolbar>
+            <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
+              Flags Helper
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Item>
+          {JSON.stringify(inputSettings)}
+          <InputSettings setInputSettings={setInputSettings} />
+          {inputSettings ? (
+            <DecisionResults inputSettings={inputSettings} />
+          ) : (
+            <div></div>
+          )}
+        </Item>
+      </Box>
+      {/* <Box sx={{ flexGrow: 1, height: '100vh' }}>
         <AppBar position='static'>
           <Toolbar>
             <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
@@ -47,7 +71,7 @@ const AppLayout = (props) => {
             </Item>
           </Grid>
         </Grid>
-      </Box>
+      </Box> */}
     </React.Fragment>
   );
 };
