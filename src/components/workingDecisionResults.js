@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 // Javascript sdk
-import { createInstance } from '@optimizely/optimizely-sdk';
+//import { createInstance } from '@optimizely/optimizely-sdk';
 // React sdk
 import {
-  //createInstance,
+  createInstance,
   OptimizelyProvider,
   useDecision,
 } from '@optimizely/react-sdk';
@@ -16,7 +16,6 @@ import { PieChart } from 'recharts';
 const DecisionResults = ({ inputSettings }) => {
   const { sdkKey, flagKey, numUsers } = inputSettings;
 
-  console.log(sdkKey);
   const optimizelyClient = createInstance({
     sdkKey: sdkKey,
   });
@@ -29,23 +28,44 @@ const DecisionResults = ({ inputSettings }) => {
     return optimizelyClient.getOptimizelyConfig() !== null;
   }
 
+  const userIds = [];
+  while (userIds.length < numUsers) {
+    // userIds.push((Math.floor(Math.random() * 999999) + 100000).toString())
+    userIds.push(`user-${userIds.length + 1}`);
+  }
+
+  // Add decisions to array for pie chart
+  // Errors currently
+  const decisions = [];
+  //   userIds.map((user) => {
+  //     const decision = GetDecision(user);
+  //     const [decision, clientReady] = useDecision(
+  //       flagKey,
+  //       {},
+  //       { overrideUserId: userId }
+  //     );
+  //     decisions.push(decision);
+  //   });
+  console.log(decisions);
+
+  let userMessages = userIds.reduce(
+    (result, userId) => ({ ...result, [userId]: [] }),
+    {}
+  );
   const donePromise = new Promise((resolve) => {
     setTimeout(() => {
       optimizelyClient.onReady().then(() => {
-        if (!optimizelyClient.isValidInstance()) {
-          console.log('hi');
+        if (isClientValid()) {
+          // userIds.forEach((userId) => {
+          //   const question = `Pretend that user ${userId} made a purchase?`;
+          //   const trackEvent = window.confirm(question);
+          //   optimizelyClient.track('purchase', userId);
+          //   const message = trackEvent
+          //                     ? "Optimizely recorded a purchase in experiment results for this user"
+          //                     : "Optimizely didn't record a purchase in experiment results for this user";
+          //   userMessages[userId].push(`${question} ${trackEvent ? 'Y' : 'N'}`, message);
+          // });
         }
-        //if (isClientValid()) {
-        // userIds.forEach((userId) => {
-        //   const question = `Pretend that user ${userId} made a purchase?`;
-        //   const trackEvent = window.confirm(question);
-        //   optimizelyClient.track('purchase', userId);
-        //   const message = trackEvent
-        //                     ? "Optimizely recorded a purchase in experiment results for this user"
-        //                     : "Optimizely didn't record a purchase in experiment results for this user";
-        //   userMessages[userId].push(`${question} ${trackEvent ? 'Y' : 'N'}`, message);
-        // });
-        //}
         resolve();
       });
     }, 500);
@@ -71,6 +91,25 @@ const DecisionResults = ({ inputSettings }) => {
         <br />
       </div>
     );
+  }
+
+  function GetDecision({ userId }) {
+    const [decision, clientReady] = useDecision(
+      flagKey,
+      {},
+      { overrideUserId: userId }
+    );
+
+    // Don't render the component if SDK client is not ready yet.
+    if (!clientReady) {
+      return null;
+    }
+
+    if (decision.enabled) {
+      setTimeout(() => setHasOnFlag(true));
+    }
+
+    return decision;
   }
 
   function Decision({ userId, setHasOnFlag }) {
@@ -126,45 +165,58 @@ const DecisionResults = ({ inputSettings }) => {
       optimizelyClient.getOptimizelyConfig().getDatafile()
     );
     projectId = datafile.projectId;
-    console.log(datafile);
   }
 
   const reportsNavLink = `https://app.optimizely.com/v2/projects/${projectId}/reports`;
 
-  //
-  // Aggregate decisions for pie chart
-  //
-  let decisions = [];
-  console.log(
-    JSON.stringify({
-      isDone: isDone,
-      isClientReady: isClientReady,
-      isClientValid: isClientValid(),
-    })
-  );
-  if (isDone && isClientReady && isClientValid()) {
-    const userIds = [];
-    while (userIds.length < numUsers) {
-      userIds.push(`user-${userIds.length + 1}`);
-    }
-    userIds.map((userId) => {
-      // Randomly assign user a country attribute of US or CO
-      let rand = Math.round(Math.random());
-      let userCountryCode = rand === 0 ? 'US' : 'CO';
-      let attributes = {
-        country: userCountryCode,
-        randomNumber: Math.round(Math.random()),
-      };
-      // Create hardcoded user & bucket user into a flag variation
-      let user = optimizelyClient.createUserContext(userId, attributes);
-      let decision = user.decide(flagKey);
-      decisions.push(decision);
-    });
-  }
-  console.log(decisions);
-
   if (inputSettings) {
-    return <div></div>;
+    return (
+      <OptimizelyProvider
+        optimizely={optimizelyClient}
+        // Generally React SDK runs for one client at a time i.e for one user throughout the lifecycle.
+        // You can provide the user Id here once and the SDK will memoize and reuse it throughout the application lifecycle.
+        // For this example, we are simulating 10 different users so we will ignore this and pass override User IDs to the useDecision hook for demonstration purpose.
+        user={{ id: 'default_user' }}
+      >
+        {isClientReady && (
+          <>
+            {userIds.map((userId) => (
+              <>
+                <Decision
+                  key={userId}
+                  userId={userId}
+                  setHasOnFlag={setHasOnFlag}
+                />
+                {userMessages[userId].map((message) => (
+                  <Pre>{message}</Pre>
+                ))}
+                <br />
+              </>
+            ))}
+            {!hasOnFlag && <FlagsOffMessage projectId={projectId} />}
+            {isDone && (
+              <>
+                <Pre>Done with your mocked A/B test.</Pre>
+                <Pre>
+                  Check out your report at{' '}
+                  <a href={reportsNavLink}>{reportsNavLink}</a>
+                </Pre>
+                <Pre>
+                  Be sure to select the environment that corresponds to your SDK
+                  key
+                </Pre>
+              </>
+            )}
+          </>
+        )}
+        {isDone && !isClientReady && (
+          <Pre>
+            Optimizely client invalid. Verify in Settings -> Environments that
+            you used the primary environment's SDK key
+          </Pre>
+        )}
+      </OptimizelyProvider>
+    );
   } else {
     return <div></div>;
   }

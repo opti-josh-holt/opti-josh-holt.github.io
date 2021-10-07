@@ -43,7 +43,6 @@ const AppLayout = (props) => {
           </Toolbar>
         </AppBar>
         <Item>
-          {JSON.stringify(inputSettings)}
           <InputSettings setInputSettings={setInputSettings} />
           {inputSettings ? (
             <DecisionResults inputSettings={inputSettings} />

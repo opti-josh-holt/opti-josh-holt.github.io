@@ -21,9 +21,10 @@ const Input = styled(MuiInput)`
 
 const InputSettings = ({ setInputSettings }) => {
   // Handle form values
-  const [sdkKey, setSdkKey] = useState('');
-  const [flagKey, setFlagKey] = useState('');
-  const [numUsers, setNumUsers] = useState('');
+  const [sdkKey, setSdkKey] = useState('9rgh3WiYAPcvfoFcRYQnk');
+  const [flagKey, setFlagKey] = useState('mab_flag');
+  const [numUsers, setNumUsers] = useState(5);
+  const [eventKey, setEventKey] = useState('');
 
   const [value, setValue] = useState(30);
 
@@ -48,6 +49,7 @@ const InputSettings = ({ setInputSettings }) => {
       sdkKey: sdkKey === '' ? null : sdkKey,
       flagKey: flagKey === '' ? null : flagKey,
       numUsers: numUsers === '' ? null : numUsers,
+      eventKey: eventKey === '' ? null : eventKey,
     };
     setInputSettings(formValues);
   };
@@ -81,6 +83,12 @@ const InputSettings = ({ setInputSettings }) => {
         required
         value={numUsers}
         onInput={(e) => setNumUsers(e.target.value)}
+      />
+      <TextField
+        id='event-key-input'
+        label='Event to mock'
+        value={eventKey}
+        onInput={(e) => setEventKey(e.target.value)}
       />
       <Button variant='contained' onClick={() => handleSubmit()}>
         Run
