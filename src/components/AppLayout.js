@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 // components
 import InputSettings from './InputSettings';
 import DecisionResults from './DecisionResults';
+import NewDecisionResults from './NewDecisionResults';
 
 // mui
 import CssBaseline from '@mui/material/CssBaseline';
@@ -44,12 +45,14 @@ const AppLayout = (props) => {
         </AppBar>
         <Item>
           <InputSettings setInputSettings={setInputSettings} />
+        </Item>
+        <div>
           {inputSettings ? (
-            <DecisionResults inputSettings={inputSettings} />
+            <NewDecisionResults inputSettings={inputSettings} />
           ) : (
             <div></div>
           )}
-        </Item>
+        </div>
       </Box>
       {/* <Box sx={{ flexGrow: 1, height: '100vh' }}>
         <AppBar position='static'>

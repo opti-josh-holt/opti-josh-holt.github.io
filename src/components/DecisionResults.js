@@ -15,9 +15,12 @@ import { PieChart } from 'recharts';
 
 const DecisionResults = ({ inputSettings }) => {
   const { sdkKey, flagKey, numUsers } = inputSettings;
+  let decisions = [];
 
-  console.log(sdkKey);
+  // Added window. to this based on Danny's demo so that in console log you can play with OptimizelyClient methods. It might not work because I didn't see much of the code
+  // dannydriscoll.website --> FIND ON GITHUB
   const optimizelyClient = createInstance({
+    //const optimizelyClient = createInstance({
     sdkKey: sdkKey,
   });
 
@@ -29,12 +32,83 @@ const DecisionResults = ({ inputSettings }) => {
     return optimizelyClient.getOptimizelyConfig() !== null;
   }
 
+  function jsGetDecisions() {}
+
   const donePromise = new Promise((resolve) => {
     setTimeout(() => {
       optimizelyClient.onReady().then(() => {
         if (!optimizelyClient.isValidInstance()) {
-          console.log('hi');
+          console.log('Invalid Opti Instance');
         }
+
+        if (isClientValid()) {
+          // NEW
+          for (let i = 0; i < numUsers; i++) {
+            // Randomly assign user a country attribute of US or CO
+            let rand = Math.round(Math.random());
+            let userCountryCode = rand === 0 ? 'US' : 'CO';
+            let attributes = {
+              country: userCountryCode,
+              randomNumber: Math.round(Math.random()),
+            };
+
+            // make a random user ID
+            const userId = Math.floor(
+              Math.random() * (100000 - 10000) + 10000
+            ).toString();
+
+            let user = optimizelyClient.createUserContext(userId, attributes);
+            let decision = user.decide(flagKey);
+            decisions.push(decision);
+            console.log(
+              `flag: ${decision.flagKey}, rule: ${decision.ruleKey}, enabled: ${decision.enabled}`
+            );
+
+            /* --------------------------------
+             Bucket user into a flag variation and mock experiment results
+             --------------------------------
+           */
+
+            //
+            //
+            // Using isFeatureEnabled
+            //
+            //
+
+            /*
+            // get flag enabled status
+            
+            const enabled = optimizelyClientInstance.isFeatureEnabled(
+              'f2',
+              userId,
+              attributes
+            );
+
+            if (enabled) {
+              // mock a purchase
+              let eventTags = {
+                revenue:
+                  userCountryCode === 'US'
+                    ? Math.floor(Math.random() * (10000 - 1000) + 1000)
+                    : Math.floor(Math.random() * (1000 - 100) + 100), // random revenue amount
+              };
+              const user = optimizelyClientInstance.createUserContext(
+                userId,
+                attributes
+              );
+              user.trackEvent('purchase', eventTags);
+
+              console.log(
+                `Purchases tracked for ${userId} for variation ${enabled}`
+              );
+            } else {
+              console.log('Experiment not active');
+            }
+
+            */
+          }
+        }
+
         //if (isClientValid()) {
         // userIds.forEach((userId) => {
         //   const question = `Pretend that user ${userId} made a purchase?`;
@@ -62,8 +136,8 @@ const DecisionResults = ({ inputSettings }) => {
         </Pre>
         <Pre>
           2. By default you have 2 keys for 2 project environments (dev/prod).
-          Verify in Settings>Environments that you used the right key for the
-          environment where your flag is toggled to ON.
+          Verify in Settings then Environments that you used the right key for
+          the environment where your flag is toggled to ON.
         </Pre>
         <Pre>
           Check your key at <a href={navLink}>{navLink}</a>
@@ -72,6 +146,8 @@ const DecisionResults = ({ inputSettings }) => {
       </div>
     );
   }
+
+  // I THINK I COULDN'T GET REACT SDK TO WORK WITH HOOKS SO I TRIED JS SDK
 
   function Decision({ userId, setHasOnFlag }) {
     // Generally React SDK runs for one client at a time i.e for one user throughout the lifecycle.
@@ -100,11 +176,12 @@ const DecisionResults = ({ inputSettings }) => {
 
     return (
       <Typography variant='body1'>
-        {`Flag ${
+        {JSON.stringify(decisions)}
+        {/* {`Flag ${
           decision.enabled ? 'on' : 'off'
         }. User number ${userId} saw flag variation: ${variationKey} as part of flag rule: ${
           decision.ruleKey
-        }`}
+        }`} */}
       </Typography>
     );
   }
@@ -126,50 +203,15 @@ const DecisionResults = ({ inputSettings }) => {
       optimizelyClient.getOptimizelyConfig().getDatafile()
     );
     projectId = datafile.projectId;
-    console.log(datafile);
   }
 
   const reportsNavLink = `https://app.optimizely.com/v2/projects/${projectId}/reports`;
-
-  //
-  // Aggregate decisions for pie chart
-  //
-  let decisions = [];
-  console.log(
-    JSON.stringify({
-      isDone: isDone,
-      isClientReady: isClientReady,
-      isClientValid: isClientValid(),
-    })
-  );
-  if (isDone && isClientReady && isClientValid()) {
-    const userIds = [];
-    while (userIds.length < numUsers) {
-      userIds.push(`user-${userIds.length + 1}`);
-    }
-    userIds.map((userId) => {
-      // Randomly assign user a country attribute of US or CO
-      let rand = Math.round(Math.random());
-      let userCountryCode = rand === 0 ? 'US' : 'CO';
-      let attributes = {
-        country: userCountryCode,
-        randomNumber: Math.round(Math.random()),
-      };
-      // Create hardcoded user & bucket user into a flag variation
-      let user = optimizelyClient.createUserContext(userId, attributes);
-      let decision = user.decide(flagKey);
-      decisions.push(decision);
-    });
-  }
   console.log(decisions);
-
-  if (inputSettings) {
-    return <div></div>;
+  if (inputSettings && decisions.length > 0) {
+    return <div>{decisions[0].flagKey}</div>;
   } else {
     return <div></div>;
   }
-
-  //return <TextField id='outlined-basic' label='Outlined' variant='outlined' />;
 };
 
 export default DecisionResults;

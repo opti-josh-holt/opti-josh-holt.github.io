@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import {
   TextField,
   Box,
-  Slider,
-  Typography,
-  Grid,
   Button,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  FormControl,
 } from '@mui/material';
 import MuiInput from '@mui/material/Input';
 import { styled } from '@mui/material/styles';
@@ -21,10 +23,12 @@ const Input = styled(MuiInput)`
 
 const InputSettings = ({ setInputSettings }) => {
   // Handle form values
-  const [sdkKey, setSdkKey] = useState('9rgh3WiYAPcvfoFcRYQnk');
-  const [flagKey, setFlagKey] = useState('mab_flag');
-  const [numUsers, setNumUsers] = useState(5);
+  const [sdkKey, setSdkKey] = useState('5D8CK43mj6URqNwwUUGWz');
+  const [flagKey, setFlagKey] = useState('product_sort');
+  const [numUsers, setNumUsers] = useState(1);
   const [eventKey, setEventKey] = useState('');
+  const [numRuns, setNumRuns] = useState(0);
+  const [sdkMethod, setSdkMethod] = useState('decide');
 
   const [value, setValue] = useState(30);
 
@@ -45,11 +49,15 @@ const InputSettings = ({ setInputSettings }) => {
   };
 
   const handleSubmit = () => {
+    // numRuns handles making decisions when "Run" button is clicked
+    setNumRuns(numRuns + 1);
     const formValues = {
       sdkKey: sdkKey === '' ? null : sdkKey,
       flagKey: flagKey === '' ? null : flagKey,
       numUsers: numUsers === '' ? null : numUsers,
       eventKey: eventKey === '' ? null : eventKey,
+      sdkMethod: sdkMethod === '' ? null : sdkMethod,
+      numRuns: numRuns,
     };
     setInputSettings(formValues);
   };
@@ -71,8 +79,8 @@ const InputSettings = ({ setInputSettings }) => {
         onInput={(e) => setSdkKey(e.target.value)}
       />
       <TextField
-        id='flag-key-input'
-        label='Flag key'
+        id='key-input'
+        label='Key (Flag/Rule/Experiment/Feature)'
         required
         value={flagKey}
         onInput={(e) => setFlagKey(e.target.value)}
@@ -90,39 +98,33 @@ const InputSettings = ({ setInputSettings }) => {
         value={eventKey}
         onInput={(e) => setEventKey(e.target.value)}
       />
+      <FormControl>
+        <FormLabel id='demo-controlled-radio-buttons-group'>
+          SDK Method
+        </FormLabel>
+        <RadioGroup
+          aria-labelledby='demo-radio-buttons-group-label'
+          value={sdkMethod}
+          name='radio-buttons-group'
+          onChange={(e) => setSdkMethod(e.target.value)}
+        >
+          <FormControlLabel value='decide' control={<Radio />} label='Decide' />
+          <FormControlLabel
+            value='activate'
+            control={<Radio />}
+            label='Activate'
+          />
+          <FormControlLabel
+            value='isFeatureEnabled'
+            control={<Radio />}
+            label='IsFeatureEnabled'
+          />
+        </RadioGroup>
+      </FormControl>
+
       <Button variant='contained' onClick={() => handleSubmit()}>
         Run
       </Button>
-      {/* 
-      <Box sx={{ width: 250 }}>
-        <Typography id='input-slider' gutterBottom>
-          Users to convert (%)
-        </Typography>
-        <Grid container spacing={2} alignItems='center'>
-          <Grid item xs>
-            <Slider
-              value={typeof value === 'number' ? value : 0}
-              onChange={handleSliderChange}
-              aria-labelledby='input-slider'
-            />
-          </Grid>
-          <Grid item>
-            <Input
-              value={value}
-              size='small'
-              onChange={handleInputChange}
-              onBlur={handleBlur}
-              inputProps={{
-                step: 10,
-                min: 0,
-                max: 100,
-                type: 'number',
-                'aria-labelledby': 'input-slider',
-              }}
-            />
-          </Grid>
-        </Grid>
-      </Box> */}
     </Box>
   );
 };
