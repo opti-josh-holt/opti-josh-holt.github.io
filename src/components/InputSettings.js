@@ -25,7 +25,7 @@ const InputSettings = ({ setInputSettings }) => {
   // Handle form values
   const [sdkKey, setSdkKey] = useState('5D8CK43mj6URqNwwUUGWz');
   const [flagKey, setFlagKey] = useState('product_sort');
-  const [numUsers, setNumUsers] = useState(1);
+  const [numUsers, setNumUsers] = useState(5);
   const [eventKey, setEventKey] = useState('');
   const [numRuns, setNumRuns] = useState(0);
   const [sdkMethod, setSdkMethod] = useState('decide');

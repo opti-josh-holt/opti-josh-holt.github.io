@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 // components
 import InputSettings from './InputSettings';
 import DecisionResults from './DecisionResults';
-import NewDecisionResults from './NewDecisionResults';
 
 // mui
 import CssBaseline from '@mui/material/CssBaseline';
@@ -48,7 +47,7 @@ const AppLayout = (props) => {
         </Item>
         <div>
           {inputSettings ? (
-            <NewDecisionResults inputSettings={inputSettings} />
+            <DecisionResults inputSettings={inputSettings} />
           ) : (
             <div></div>
           )}
