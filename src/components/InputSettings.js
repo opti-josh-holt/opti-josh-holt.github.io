@@ -29,6 +29,7 @@ const InputSettings = ({ setInputSettings }) => {
   const [eventKey, setEventKey] = useState('');
   const [numRuns, setNumRuns] = useState(0);
   const [sdkMethod, setSdkMethod] = useState('decide');
+  const [attributes, setAttributes] = useState('{device: "ios"}');
 
   const [value, setValue] = useState(30);
 
@@ -96,6 +97,12 @@ const InputSettings = ({ setInputSettings }) => {
         id='event-key-input'
         label='Event to mock'
         value={eventKey}
+        onInput={(e) => setEventKey(e.target.value)}
+      />
+        <TextField
+        id='attributes-input'
+        label='User attributes'
+        value={attributes}
         onInput={(e) => setEventKey(e.target.value)}
       />
       <FormControl>

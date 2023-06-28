@@ -15,7 +15,7 @@ import { PieChart } from 'recharts';
 import DecisionTable from './DecisionTable';
 
 const DecisionResults = ({ inputSettings }) => {
-  const { sdkKey, flagKey, numUsers, sdkMethod, eventKey, numRuns } =
+  const { sdkKey, flagKey, numUsers, sdkMethod, eventKey, numRuns, attributes } =
     inputSettings;
   const [allDecisions, setAllDecisions] = useState([]);
 
@@ -89,7 +89,7 @@ const DecisionResults = ({ inputSettings }) => {
         ).toString();
 
         if (sdkMethod === 'decide') {
-          let user = optimizelyClient.createUserContext(userId);
+          let user = optimizelyClient.createUserContext(userId, attributes);
           let decision = user.decide(decisionKey);
 
           // Send event
@@ -106,7 +106,7 @@ const DecisionResults = ({ inputSettings }) => {
             enabled: decision.enabled,
           });
         } else if (sdkMethod === 'activate') {
-          let activation = optimizelyClient.activate(decisionKey, userId);
+          let activation = optimizelyClient.activate(decisionKey, userId, attributes);
 
           // Send event
           if (eventKey) {
@@ -127,7 +127,7 @@ const DecisionResults = ({ inputSettings }) => {
 
           // Send event
           if (eventKey) {
-            optimizelyClient.track(eventKey, userId);
+            optimizelyClient.track(eventKey, userId, attributes);
           }
           decisionArray.push({
             userId: userId,
