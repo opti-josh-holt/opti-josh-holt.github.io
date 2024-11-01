@@ -29,7 +29,7 @@ const InputSettings = ({ setInputSettings }) => {
   const [eventKey, setEventKey] = useState('');
   const [numRuns, setNumRuns] = useState(0);
   const [sdkMethod, setSdkMethod] = useState('decide');
-  const [attributes, setAttributes] = useState('{device: "ios"}');
+  const [attributes, setAttributes] = useState('{"device": "ios"}');
 
   const [value, setValue] = useState(30);
 
@@ -59,6 +59,7 @@ const InputSettings = ({ setInputSettings }) => {
       eventKey: eventKey === '' ? null : eventKey,
       sdkMethod: sdkMethod === '' ? null : sdkMethod,
       numRuns: numRuns,
+      attributes: attributes
     };
     setInputSettings(formValues);
   };
@@ -103,7 +104,7 @@ const InputSettings = ({ setInputSettings }) => {
         id='attributes-input'
         label='User attributes'
         value={attributes}
-        onInput={(e) => setEventKey(e.target.value)}
+        onInput={(e) => setAttributes(e.target.value)}
       />
       <FormControl>
         <FormLabel id='demo-controlled-radio-buttons-group'>

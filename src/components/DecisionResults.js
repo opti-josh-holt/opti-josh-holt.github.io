@@ -89,13 +89,29 @@ const DecisionResults = ({ inputSettings }) => {
         ).toString();
 
         if (sdkMethod === 'decide') {
-          let user = optimizelyClient.createUserContext(userId, attributes);
+          let atts = JSON.parse(attributes);
+
+          let user = optimizelyClient.createUserContext(userId, atts);
+          console.log(user)
           let decision = user.decide(decisionKey);
 
+          console.log(decision);
+          
           // Send event
           if (eventKey) {
             // TODO - implement event tags
-            user.trackEvent(eventKey);
+            // const properties = { 
+            //   category: 'shoes', 
+            //   color: 'red' 
+            // }; 
+            const randRev = (Math.random() * 100).toFixed(2);
+            const randVal = (Math.random() * 100).toFixed(2);
+            const tags = { 
+              //$opt_event_properties: properties,
+              revenue: randRev,
+              value: randVal
+            }; 
+            user.trackEvent(eventKey, tags);
           }
 
           decisionArray.push({
@@ -141,7 +157,6 @@ const DecisionResults = ({ inputSettings }) => {
   }
 
   // RENDER RESULTS
-  console.log(eventKey);
 
   if (allDecisions.length > 0) {
     return (
